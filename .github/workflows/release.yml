@@ -32,6 +32,9 @@ jobs:
       - run: npm ci
       - run: npm run build:web
       - run: npx electron-builder --win nsis
+      - name: Paket bilgisini yaz
+        shell: bash
+        run: node -e "const fs=require('fs');const v=require('./version.json');fs.writeFileSync('release/latest.json', JSON.stringify({version:v.version,releasedAt:v.releasedAt,notes:v.notes,installer:v.installer},null,2)+'\n');"
       - name: Sürüm notlarını hazırla
         shell: bash
         run: node -e "const v=require('./version.json');const fs=require('fs');fs.writeFileSync('release-notes.md', '## StockManager v'+v.version+'\n\n'+v.notes.map(n=>'- '+n).join('\n')+'\n\nKurulum paketi: `'+v.installer.file+'`\n');"
