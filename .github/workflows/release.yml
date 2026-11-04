@@ -1,0 +1,49 @@
+name: Windows kurulum paketi
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Sürümü doğrula
+        shell: bash
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          META_VERSION=$(node -p "require('./version.json').version")
+          if [ "$PKG_VERSION" != "$META_VERSION" ]; then
+            echo "package.json ($PKG_VERSION) ile version.json ($META_VERSION) sürümleri farklı."
+            exit 1
+          fi
+          if [[ "$GITHUB_REF" == refs/tags/v* ]] && [ "${GITHUB_REF#refs/tags/v}" != "$PKG_VERSION" ]; then
+            echo "Etiket sürümü package.json sürümüyle eşleşmiyor."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run build:web
+      - run: npx electron-builder --win nsis
+      - name: Sürüm notlarını hazırla
+        shell: bash
+        run: node -e "const v=require('./version.json');const fs=require('fs');fs.writeFileSync('release-notes.md', '## StockManager v'+v.version+'\n\n'+v.notes.map(n=>'- '+n).join('\n')+'\n\nKurulum paketi: `'+v.installer.file+'`\n');"
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          files: |
+            release/StockManager-Setup-*.exe
+            release/latest.json
+            version.json
+          fail_on_unmatched_files: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stockmanager-windows
+          path: release/StockManager-Setup-*.exe

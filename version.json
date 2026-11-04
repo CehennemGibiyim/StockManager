@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "releasedAt": "2026-11-04",
+  "notes": [
+    "Personel26 esintili yeni koyu arayüz, Lucide ikonları ve cam panel tasarımı.",
+    "Yardım merkezinde gerçek ekran görüntüleriyle 5 resimli kılavuz.",
+    "Türkçe sesli anlatımlı, 9 adımlı hareketli panel turu.",
+    "Web sürümü ve Windows kurulum paketi aynı kaynaktan üretiliyor.",
+    "Sürüm notları ve güncel kurulum paketi bağlantısı panel içinde."
+  ],
+  "installer": {
+    "file": "StockManager-Setup-1.0.0.exe",
+    "url": "https://github.com/CehennemGibiyim/StockManager/releases/download/v1.0.0/StockManager-Setup-1.0.0.exe"
+  },
+  "web": "https://cehennemgibiyim.github.io/StockManager/"
+}

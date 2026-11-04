@@ -1,0 +1,220 @@
+{
+  "updated": "2026-11-04",
+  "guides": [
+    {
+      "id": "urun-ekleme",
+      "tag": "ÜRÜNLER",
+      "title": "Ürün ekleyip stok kartı oluşturma",
+      "summary": "Kataloğunuza yeni bir ürün ekleyin, alt limit ve birim fiyatı belirleyin.",
+      "image": "assets/help/products.png",
+      "steps": [
+        {
+          "title": "Ürünler ekranını açın",
+          "text": "Sol menüden Ürünler & stok seçeneğine tıklayın. Tüm stok kartları, mevcut miktar ve durum etiketleriyle listelenir.",
+          "x": 9,
+          "y": 25
+        },
+        {
+          "title": "Yeni ürün düğmesi",
+          "text": "Sağ üstteki Ürün ekle düğmesine basın. Açılan formda ürün adı, stok kodu ve kategori alanlarını doldurun.",
+          "x": 90,
+          "y": 12
+        },
+        {
+          "title": "Alt limit ve fiyat",
+          "text": "Alt limit, ürünün kritik seviyesidir. Mevcut stok bu sayının altına düştüğünde panel sizi uyarır. Birim fiyat stok değeri hesabında kullanılır.",
+          "x": 58,
+          "y": 59
+        },
+        {
+          "title": "Arama ve dışa aktarma",
+          "text": "Üstteki arama alanıyla ada veya stok koduna göre filtreleyin; CSV dışa aktar ile listeyi Excel'e taşıyın.",
+          "x": 36,
+          "y": 28
+        }
+      ]
+    },
+    {
+      "id": "alim-kaydi",
+      "tag": "ALIMLAR",
+      "title": "Alım kaydı ve tedarikçi takibi",
+      "summary": "Gelen malı tedarikçisi, paket adedi ve birim fiyatıyla kaydedin.",
+      "image": "assets/help/purchases.png",
+      "steps": [
+        {
+          "title": "Alımlar ekranı",
+          "text": "Sol menüden Alımlar seçeneğine geçin. Kayıtlı alımlar tarih, tedarikçi ve toplam tutarla listelenir.",
+          "x": 9,
+          "y": 33
+        },
+        {
+          "title": "Alım ekle",
+          "text": "Alım ekle düğmesiyle yeni kayıt açın. Ürünü seçin, tedarikçi adını ve paket adedini girin.",
+          "x": 90,
+          "y": 11
+        },
+        {
+          "title": "Tutar ve not",
+          "text": "Birim fiyatı yazdığınızda toplam otomatik hesaplanır. Not alanına fatura numarası veya sevkiyat bilgisi ekleyebilirsiniz.",
+          "x": 68,
+          "y": 51
+        },
+        {
+          "title": "Tedarikçi özeti",
+          "text": "Tedarikçiler ekranında her firmanın alım adedi ve toplam harcaması otomatik özetlenir.",
+          "x": 9,
+          "y": 37
+        }
+      ]
+    },
+    {
+      "id": "hareket-girisi",
+      "tag": "HAREKETLER",
+      "title": "Stok girişi ve çıkışı nasıl yapılır?",
+      "summary": "Kullanım, satış veya fire kayıtlarını hareket olarak işleyin.",
+      "image": "assets/help/movements.png",
+      "steps": [
+        {
+          "title": "Hareketler ekranı",
+          "text": "Sol menüden Hareketler seçeneğini açın. Tüm giriş ve çıkışlar tarih sırasıyla görünür.",
+          "x": 9,
+          "y": 29
+        },
+        {
+          "title": "Hareket ekle",
+          "text": "Hareket ekle düğmesine basın; ürün, hareket tipi (giriş/çıkış), miktar ve tarih bilgisini girin.",
+          "x": 90,
+          "y": 11
+        },
+        {
+          "title": "Filtreleyin",
+          "text": "Arama alanı ve tarih filtreleriyle yalnızca ilgilendiğiniz kayıtları görüntüleyin.",
+          "x": 32,
+          "y": 37
+        },
+        {
+          "title": "Sonuçları yazdır",
+          "text": "Filtrelenmiş listeyi yazdırarak depo ekibiyle paylaşabilirsiniz.",
+          "x": 87,
+          "y": 37
+        }
+      ]
+    },
+    {
+      "id": "raporlar",
+      "tag": "RAPORLAR",
+      "title": "Rapor ve çıktı merkezi",
+      "summary": "Stok, hareket ve tedarikçi raporlarını tek tıkla indirin veya yazdırın.",
+      "image": "assets/help/reports.png",
+      "steps": [
+        {
+          "title": "Çıktı merkezi",
+          "text": "Sol menüden Çıktı merkezini açın. Hazır rapor kartları listelenir.",
+          "x": 9,
+          "y": 50
+        },
+        {
+          "title": "Stok durum raporu",
+          "text": "CSV indir düğmesiyle mevcut, kritik ve tükenen ürünleri tablo olarak indirin.",
+          "x": 33,
+          "y": 36
+        },
+        {
+          "title": "A4 stok özeti",
+          "text": "Yazdır düğmesi, ürün ve değer bilgilerini tam sayfa A4 tablosuna dönüştürür.",
+          "x": 33,
+          "y": 57
+        },
+        {
+          "title": "Pivot tablo",
+          "text": "Kategori ve durum bazında özet görmek için Pivot tablo ekranını kullanın.",
+          "x": 9,
+          "y": 45
+        }
+      ]
+    },
+    {
+      "id": "yedekleme",
+      "tag": "YEDEKLEME",
+      "title": "Verilerinizi yedekleyin ve geri yükleyin",
+      "summary": "Tüm kayıtları JSON olarak indirin, başka bilgisayarda geri yükleyin.",
+      "image": "assets/help/backup.png",
+      "steps": [
+        {
+          "title": "Yedekleme ekranı",
+          "text": "Sol menüden Yedekleme seçeneğine girin. Veriler yalnızca bu bilgisayarda saklanır.",
+          "x": 9,
+          "y": 55
+        },
+        {
+          "title": "JSON yedeği indir",
+          "text": "Ürün, hareket ve alım kayıtlarının tamamı tek bir JSON dosyasına aktarılır. Dosyayı güvenli bir yerde saklayın.",
+          "x": 34,
+          "y": 37
+        },
+        {
+          "title": "Geri yükle",
+          "text": "Dosya seç ile daha önce aldığınız yedeği yükleyin. Mevcut kayıtların üzerine yazılacağını unutmayın.",
+          "x": 68,
+          "y": 37
+        }
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "title": "StockManager'a hoş geldiniz",
+      "text": "Bu kısa tur panelin tamamını adım adım gösterir. Her ekranı açar, ilgili düğmeyi işaret eder ve Türkçe sesli olarak anlatır.",
+      "view": "dashboard",
+      "target": null
+    },
+    {
+      "title": "Stok raporu",
+      "text": "Genel bakış ekranı toplam ürün, mevcut paket, stok değeri ve dikkat gerektiren ürün sayısını tek bakışta gösterir.",
+      "view": "dashboard",
+      "target": "#metricGrid"
+    },
+    {
+      "title": "Ürünler ve stok",
+      "text": "Sol menüden Ürünler & stok ekranına geçin. Ürün ekleyebilir, arayabilir ve listeyi CSV olarak indirebilirsiniz.",
+      "view": "products",
+      "target": "#view-products .view-heading"
+    },
+    {
+      "title": "Yeni ürün ekleme",
+      "text": "Buradaki Ürün ekle düğmesi ürün adı, stok kodu, kategori, mevcut stok, alt limit ve birim fiyat alanlarını açar.",
+      "view": "products",
+      "target": "#productAdd"
+    },
+    {
+      "title": "Hareketler",
+      "text": "Giriş ve çıkış hareketlerini burada kaydedin. Hareket kaydı stoğu otomatik günceller ve geçmişi saklar.",
+      "view": "movements",
+      "target": "#movementAdd"
+    },
+    {
+      "title": "Alımlar ve tedarikçiler",
+      "text": "Alım ekle ile gelen malı tedarikçi, paket ve birim fiyatla kaydedin; tedarikçi özetleri otomatik oluşur.",
+      "view": "purchases",
+      "target": "#purchaseAdd"
+    },
+    {
+      "title": "Raporlar",
+      "text": "Çıktı merkezinde stok, hareket, alım ve tedarikçi raporlarını CSV olarak indirebilir veya yazdırabilirsiniz.",
+      "view": "reports",
+      "target": "#view-reports .report-grid"
+    },
+    {
+      "title": "Yedekleme",
+      "text": "Verileriniz tarayıcınızda veya uygulamada yerel olarak tutulur. Yedekleme ekranından JSON olarak indirip geri yükleyebilirsiniz.",
+      "view": "backup",
+      "target": ".backup-card"
+    },
+    {
+      "title": "Yardım her zaman burada",
+      "text": "Yardım merkezinde resimli kılavuzlar ve bu sesli tur bulunur. İyi çalışmalar dileriz.",
+      "view": "help",
+      "target": "#helpGuideGrid"
+    }
+  ]
+}
