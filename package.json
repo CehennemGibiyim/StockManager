@@ -18,7 +18,7 @@
     "build": "npm run build:web",
     "preview": "vite preview",
     "start:desktop": "npm run build:web && electron .",
-    "dist:win": "npm run build:web && electron-builder --win nsis",
+    "dist:win": "npm run build:web && electron-builder --win nsis --publish never",
     "release": "node scripts/release.mjs",
     "release:same": "node scripts/release.mjs --same-version"
   },

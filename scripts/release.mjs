@@ -92,7 +92,7 @@ if (!flag('--skip-web')) {
 
 if (!flag('--no-installer')) {
   console.log('\nWindows kurulum paketi hazırlanıyor...');
-  run('npx', ['electron-builder', '--win', 'nsis']);
+  run('npx', ['electron-builder', '--win', 'nsis', '--publish', 'never']);
   const artifact = path.join(root, 'release', `StockManager-Setup-${version}.exe`);
   if (!fs.existsSync(artifact)) {
     console.error(`Kurulum paketi bulunamadı: ${path.relative(root, artifact)}`);
