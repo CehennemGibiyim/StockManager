@@ -1,16 +1,17 @@
 {
-  "version": "1.0.0",
-  "releasedAt": "2026-11-04",
+  "version": "1.1.0",
+  "releasedAt": "2026-11-05",
   "notes": [
-    "Personel26 esintili yeni koyu arayüz, Lucide ikonları ve cam panel tasarımı.",
-    "Yardım merkezinde gerçek ekran görüntüleriyle 5 resimli kılavuz.",
-    "Türkçe sesli anlatımlı, 9 adımlı hareketli panel turu.",
-    "Web sürümü ve Windows kurulum paketi aynı kaynaktan üretiliyor.",
-    "Sürüm notları ve güncel kurulum paketi bağlantısı panel içinde."
+    "Veriler artık her açılışta aynı yerel adresten yükleniyor; kapatıp açınca kaybolma sorunu giderildi.",
+    "Otomatik yedekleme: kapanışta, 5 dakikada bir ve her manuel yedekte kurulum klasöründeki backups dizinine yazılır.",
+    "Yedekler 7 gün saklanır; 8. güne giren dosyalar açılışta ve her yedekte otomatik silinir.",
+    "Yedekler boşsa uygulama son yedeği kendiliğinden geri yükler; Yardım > Yedekleme ekranından eski bir yedek seçilebilir.",
+    "Yardım > Sürüm notları bölümüne Güncellemeleri denetle düğmesi eklendi; ara sürümler atlanıp doğrudan en yeni sürüme geçilir.",
+    "Bu sürümü atla seçeneği ile istenmeyen sürümler atlanır, daha yenisi çıkınca tekrar sorulur."
   ],
   "installer": {
-    "file": "StockManager-Setup-1.0.0.exe",
-    "url": "https://github.com/CehennemGibiyim/StockManager/releases/download/v1.0.0/StockManager-Setup-1.0.0.exe"
+    "file": "StockManager-Setup-1.1.0.exe",
+    "url": "https://github.com/CehennemGibiyim/StockManager/releases/download/v1.1.0/StockManager-Setup-1.1.0.exe"
   },
   "web": "https://cehennemgibiyim.github.io/StockManager/"
 }
