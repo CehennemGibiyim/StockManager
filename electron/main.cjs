@@ -240,11 +240,11 @@ function registerIpc() {
   ipcMain.handle('desktop:open-releases', () => shell.openExternal(updater.RELEASES_PAGE));
 
   ipcMain.handle('desktop:install-update', async (_event, payload) => {
-    const url = (payload && payload.url) || (pendingInstaller && pendingInstaller.url);
-    if (!url || !/^https:\/\/github\.com\//i.test(url)) {
+    const url = payload && payload.url;
+    if (!url || !updater.isTrustedDownloadUrl(url) || !/\.exe(?:$|[?#])/i.test(String(url))) {
       return { ok: false, error: 'Kurulum paketi adresi geçersiz.' };
     }
-    const fileName = (pendingInstaller && pendingInstaller.file) || path.basename(new URL(url).pathname);
+    const fileName = path.basename(new URL(url).pathname);
     const destination = updater.installerPathFor(fileName);
     try {
       await updater.downloadInstaller(url, destination, (percent) => {
@@ -255,6 +255,8 @@ function registerIpc() {
       const openResult = await shell.openPath(destination);
       if (openResult) return { ok: false, error: openResult };
       writePrefs({ skippedVersion: null, installedAt: new Date().toISOString() });
+      // NSIS kurulumu uygulamanın kapanmasını bekler; kurulum açıldıktan sonra çık.
+      setTimeout(() => app.quit(), 1400);
       return { ok: true, path: destination };
     } catch (error) {
       return { ok: false, error: error.message };

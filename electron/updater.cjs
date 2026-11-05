@@ -12,6 +12,18 @@ const SOURCES = [
 ];
 const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
 const TIMEOUT_MS = 9000;
+const DOWNLOAD_TIMEOUT_MS = 10 * 60 * 1000;
+const MIN_INSTALLER_BYTES = 1024 * 1024;
+
+function isTrustedDownloadUrl(value) {
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase();
+    return parsed.protocol === 'https:' && (host === 'github.com' || host.endsWith('.githubusercontent.com'));
+  } catch (error) {
+    return false;
+  }
+}
 
 function fetchJson(url, redirects = 0) {
   return new Promise((resolve, reject) => {
@@ -93,15 +105,31 @@ async function checkForUpdates({ currentVersion, skippedVersion = null }) {
 /** Kurulum paketini indirir; yüzde bilgisini callback ile bildirir. */
 function downloadInstaller(url, destination, onProgress = () => {}) {
   return new Promise((resolve, reject) => {
-    const request = https.get(url, { headers: { 'User-Agent': 'StockManager-Updater' } }, (response) => {
+    if (!isTrustedDownloadUrl(url)) {
+      reject(new Error('Güncelleme adresi güvenli değil; indirme durduruldu.'));
+      return;
+    }
+    const fail = (error) => {
+      try { fs.rmSync(destination, { force: true }); } catch (cleanupError) { /* yoksay */ }
+      reject(error);
+    };
+    const request = https.get(url, {
+      timeout: DOWNLOAD_TIMEOUT_MS,
+      headers: { 'User-Agent': 'StockManager-Updater' }
+    }, (response) => {
       if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
         response.resume();
-        resolve(downloadInstaller(new URL(response.headers.location, url).toString(), destination, onProgress));
+        const next = new URL(response.headers.location, url).toString();
+        if (!isTrustedDownloadUrl(next)) {
+          fail(new Error('İndirme güvenli olmayan bir adrese yönlendi.'));
+          return;
+        }
+        resolve(downloadInstaller(next, destination, onProgress));
         return;
       }
       if (response.statusCode !== 200) {
         response.resume();
-        reject(new Error(`İndirme başarısız (HTTP ${response.statusCode}).`));
+        fail(new Error(`İndirme başarısız (HTTP ${response.statusCode}).`));
         return;
       }
       const total = Number(response.headers['content-length'] || 0);
@@ -111,12 +139,32 @@ function downloadInstaller(url, destination, onProgress = () => {}) {
         received += chunk.length;
         if (total) onProgress(Math.min(100, Math.round((received / total) * 100)));
       });
+      response.on('error', fail);
       response.pipe(file);
-      file.on('finish', () => file.close(() => resolve(destination)));
-      file.on('error', reject);
+      file.on('error', fail);
+      file.on('finish', () => file.close(() => {
+        try {
+          const stat = fs.statSync(destination);
+          if (stat.size < MIN_INSTALLER_BYTES) {
+            fail(new Error('İndirilen kurulum paketi doğrulanamadı (dosya küçük).'));
+            return;
+          }
+          const descriptor = fs.openSync(destination, 'r');
+          const header = Buffer.alloc(2);
+          fs.readSync(descriptor, header, 0, 2, 0);
+          fs.closeSync(descriptor);
+          if (header.toString('ascii') !== 'MZ') {
+            fail(new Error('İndirilen dosya geçerli bir Windows kurulum paketi değil.'));
+            return;
+          }
+          resolve(destination);
+        } catch (error) {
+          fail(error);
+        }
+      }));
     });
     request.on('timeout', () => request.destroy(new Error('İndirme zaman aşımına uğradı.')));
-    request.on('error', reject);
+    request.on('error', fail);
   });
 }
 
@@ -128,6 +176,7 @@ function installerPathFor(fileName) {
 module.exports = {
   REPO,
   RELEASES_PAGE,
+  isTrustedDownloadUrl,
   fetchLatestVersion,
   checkForUpdates,
   downloadInstaller,

@@ -39,15 +39,15 @@ function parseBackupDate(name) {
 
 /**
  * Saklama süresini aşan yedekleri seçer.
- * 7 günlük yedekler korunur, 8. güne giren (yaşı 7 günü aşan) dosyalar silinir.
+ * Bugün dahil son 7 takvim günü korunur; 8. güne giren dosyalar silinir.
  */
 function selectExpired(names, now = new Date(), retentionDays = RETENTION_DAYS) {
-  const limit = retentionDays * DAY_MS;
-  const reference = now instanceof Date ? now.getTime() : new Date(now).getTime();
+  const reference = now instanceof Date ? now : new Date(now);
+  const cutoff = new Date(reference.getFullYear(), reference.getMonth(), reference.getDate() - (retentionDays - 1), 0, 0, 0, 0);
   return names.filter((name) => {
     const date = parseBackupDate(name);
     if (!date) return false;
-    return reference - date.getTime() > limit;
+    return date < cutoff;
   });
 }
 

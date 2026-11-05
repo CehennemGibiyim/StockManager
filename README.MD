@@ -19,9 +19,10 @@ Tüm veriler yerel kalır; bulut hesabı, giriş veya sunucu gerekmez. Web sür�
 - Alım kayıtları, tedarikçi özetleri ve maliyet hesapları.
 - Kritik/tükenen ürün uyarıları, kategori pivot tablosu ve istatistik grafikleri.
 - CSV dışa aktarma, A4 yazdırma, JSON yedekleme ve geri yükleme.
+- Windows'ta otomatik yedekleme: açılışta, 5 dakikada bir, kapanışta ve manuel yedekte kurulum klasöründeki `backups` dizinine yazar. Son 7 gün saklanır, 8. güne giren dosyalar silinir.
 - Yardım merkezi: 5 resimli kılavuz, numaralı ekran görüntüsü işaretleri ve adım listesi.
 - Türkçe sesli anlatımlı 9 adımlı rehber turu. Ses kapalıysa altyazı ve zamanlayıcıyla ilerler.
-- Panel içinde sürüm notları ve güncel kurulum paketi bağlantısı.
+- Yardım > Sürüm notları içinde güncelleme denetimi: yeni sürüm varsa doğrudan en yenisine geçer, istenirse sürüm atlanır.
 
 ## Geliştirme
 
@@ -49,6 +50,20 @@ npm run dist:win
 
 Çıktı: `release/StockManager-Setup-<sürüm>.exe`. NSIS kurulumu kurulum klasörünü seçmeye izin verir, masaüstü ve başlat menüsü kısayolları oluşturur. Kaldırma sırasında kullanıcı verileri silinmez.
 
+Kurulum paketi imzasız olduğu için ilk açılışta Windows SmartScreen uyarısı gösterebilir. **Daha fazla bilgi → Yine de çalıştır** ile devam edilebilir.
+
+## Yedekleme ve güncelleme
+
+Masaüstü sürümü verileri yerel profilinde tutar; yedekleri ise kurulum klasörünün yanındaki `backups` dizinine yazar. Varsayılan kullanıcı kurulumunda bu yol `%LOCALAPPDATA%\Programs\StockManager\backups` olur; kurulum sırasında başka bir klasör seçtiyseniz yedekler oradadır:
+
+- Uygulama açılırken, her 5 dakikada bir, kapanırken ve **Yedeği şimdi al** düğmesine basıldığında zaman damgalı JSON yedeği oluşur.
+- Her yedeğin yanında son yedeği taşıyan `latest.json` güncellenir. Yerel veri boşsa uygulama açılışta bu dosyayı kendiliğinden geri yükler.
+- Bugün dahil son 7 takvim günü saklanır; 8. güne giren eski yedekler açılışta ve her yedeklemede otomatik silinir.
+- Yedekleme ekranındaki **Yedekten geri yükle** ile önceki dosyalardan biri seçilebilir; **Yedek klasörünü aç** ile klasör görüntülenir.
+- Web sürümünde tarayıcı indirmesi kullanılır; otomatik klasör yedeklemesi yalnızca Windows uygulamasında çalışır.
+
+Yardım > Sürüm notları bölümündeki **Güncellemeleri denetle** düğmesi GitHub'daki en güncel sürümü okur. Yeni sürüm varsa ara sürümler atlanır, kurulum paketi uygulama içinden indirilip kurulum sihirbazı açılır. **Bu sürümü atla** seçeneği yalnızca o sürümü gizler; daha yeni bir sürüm çıktığında denetim yeniden gösterilir.
+
 ## Yeni sürüm ve sürüm notu
 
 Her değişiklikten sonra tek komutla sürümü yükseltip notları yazabilir ve güncel kurulum paketini üretebilirsiniz:
@@ -74,8 +89,8 @@ Ardından sürümü etiketleyip gönderin:
 
 ```bash
 git add -A
-git commit -m "Sürüm v1.0.0: yeni arayüz ve sesli rehber"
-git tag v1.0.0
+git commit -m "Sürüm v1.1.0: otomatik yedekleme ve uygulama içi güncelleme"
+git tag v1.1.0
 git push origin main --tags
 ```
 
@@ -96,7 +111,11 @@ help.js                  Yardım merkezi, kılavuz modalı, sesli tur
 help/guides.json         Kılavuz adımları ve tur metinleri
 assets/help/*.png        Gerçek panel ekran görüntüleri
 assets/fonts, vendor     Yerel fontlar ve Lucide
-electron/main.cjs        Masaüstü kabuk ve yerel statik sunucu
+electron/main.cjs        Masaüstü kabuk, sabit origin ve IPC
+electron/bridge.js       Masaüstü yedekleme/güncelleme arayüz köprüsü
+electron/backup.cjs       Yedek dizini, yazma ve saklama temizliği
+electron/lib.cjs          Saf yedek/sürüm yardımcıları
+electron/updater.cjs      GitHub sürüm denetimi ve kurulum indirme
 scripts/build-web.mjs    dist/web üretimi
 scripts/release.mjs      Sürüm + installer akışı
 version.json             Güncel sürüm, notlar, indirme bağlantısı
@@ -105,8 +124,8 @@ version.json             Güncel sürüm, notlar, indirme bağlantısı
 ## Veri ve gizlilik
 
 - Web sürümünde veriler yalnızca tarayıcının yerel depolamasında tutulur.
-- Windows sürümünde veriler Electron kullanıcı profilinde tutulur.
-- Dışarıya veri gönderilmez, analitik veya takip kodu yoktur.
+- Windows sürümünde veriler Electron kullanıcı profilinde tutulur; otomatik yedekler kurulum klasöründeki `backups` dizinine yazılır.
+- Dışarıya veri gönderilmez, analitik veya takip kodu yoktur. Güncelleme denetimi yalnızca GitHub'daki sürüm dosyasını okur.
 - Yedekleme ekranından JSON yedeği alıp başka bilgisayarda geri yükleyebilirsiniz.
 
 ## Lisans

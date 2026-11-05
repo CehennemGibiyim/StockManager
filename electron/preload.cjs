@@ -23,8 +23,9 @@ contextBridge.exposeInMainWorld('stockManagerDesktop', {
   openBackupFolder: () => ipcRenderer.invoke('desktop:open-backup-folder'),
   checkUpdates: () => ipcRenderer.invoke('desktop:check-updates'),
   skipVersion: (version) => ipcRenderer.invoke('desktop:skip-version', { version }),
-  installUpdate: () => ipcRenderer.invoke('desktop:install-update'),
+  installUpdate: (url) => ipcRenderer.invoke('desktop:install-update', { url }),
   openReleases: () => ipcRenderer.invoke('desktop:open-releases'),
   onFlushRequest: (handler) => subscribe('desktop:flush-request', handler),
-  onBackupSaved: (handler) => subscribe('desktop:backup-saved', handler)
+  onBackupSaved: (handler) => subscribe('desktop:backup-saved', handler),
+  onUpdateProgress: (handler) => subscribe('desktop:update-progress', handler)
 });

@@ -6,14 +6,15 @@ Tüm önemli değişiklikler bu dosyada tutulur. Kurulum paketleri GitHub Releas
 
 ### Düzeltildi
 
-- Masaüstü sürümü her açılışta rastgele port kullandığı için tarayıcı deposunun origin'i değişiyor ve kayıtlar yeni oturumda görünmüyordu. Sunucu artık sabit portu (varsayılan 4571) tercih dosyasından okuyup yeniden kullanıyor.
+- Veriler artık her açılışta aynı yerel adresten yükleniyor; kapatıp açınca kaybolma sorunu giderildi.
 - "Yedek al" düğmesi masaüstünde yalnızca tarayıcı indirmesi tetikliyordu; artık kurulum klasöründeki `backups` dizinine yazıyor.
 - Uygulama kapanırken yedek alınmıyordu; kapanış öncesi son kayıt diske yazılıyor.
+- Güncelleme indirme adresi ana sürece aktarılmıyordu; uygulama içi güncelleme artık çalışıyor ve kurulum açıldıktan sonra uygulama kapanıyor.
 
 ### Yeni
 
-- Otomatik yedekleme: açılışta, 5 dakikada bir, kapanışta ve manuel yedekte zaman damgalı JSON + `latest.json` kopyası.
-- Saklama politikası: 7 günlük yedekler korunur, 8. güne giren dosyalar açılışta ve her yedekte silinir.
+- Otomatik yedekleme: açılışta, kapanışta, 5 dakikada bir ve her manuel yedekte kurulum klasöründeki `backups` dizinine zaman damgalı JSON + `latest.json` kopyası.
+- Saklama politikası: bugün dahil son 7 takvim günü korunur, 8. güne giren dosyalar açılışta ve her yedekte silinir.
 - Yedekten geri yükleme: veri boşsa son yedek kendiliğinden yüklenir; Yardım > Yedekleme ekranından eski yedek seçilebilir, klasör açılabilir.
 - Yardım > Sürüm notları bölümünde **Güncellemeleri denetle**: kurulu sürümle GitHub'daki en yeni sürüm karşılaştırılır, ara sürümler atlanır, kurulum paketi indirilip başlatılır.
 - **Bu sürümü atla**: atlanan sürüm için tekrar sorulmaz, daha yenisi çıkınca hatırlatılır.

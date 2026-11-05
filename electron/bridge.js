@@ -17,6 +17,8 @@
   let lastHash = null;
   let lastAutoSave = 0;
   let busy = false;
+  let startupSaved = false;
+  let closeSavedAt = 0;
 
   function readData() {
     try {
@@ -71,6 +73,19 @@
       node.style.opacity = '0';
       window.setTimeout(() => node.remove(), 250);
     }, 3200);
+  }
+
+  async function saveStartupBackup() {
+    if (startupSaved) return;
+    const result = await pushBackup('startup');
+    startupSaved = Boolean(result);
+  }
+
+  function saveCloseBackup() {
+    // pagehide, beforeunload ve ana süreçteki flush isteği aynı kapanışta gelebilir.
+    if (Date.now() - closeSavedAt < 2500) return;
+    closeSavedAt = Date.now();
+    pushBackup('close');
   }
 
   async function pushBackup(reason) {
@@ -282,7 +297,13 @@
       }
       button.disabled = true;
       progress.textContent = 'Kurulum paketi indiriliyor…';
+      const unsubscribe = typeof desktop.onUpdateProgress === 'function'
+        ? desktop.onUpdateProgress(({ percent }) => {
+          progress.textContent = `Kurulum paketi indiriliyor… %${Math.max(0, Math.min(100, Number(percent) || 0))}`;
+        })
+        : () => {};
       const outcome = await desktop.installUpdate(result.installerUrl);
+      unsubscribe();
       if (outcome && outcome.ok) {
         progress.textContent = 'Kurulum başlatıldı. Uygulama kapanacak.';
       } else {
@@ -328,8 +349,11 @@
       renderBackupStatus(files.length ? { dir, file: files[0].name } : { dir, file: null });
     }).catch(() => {});
 
+    // Uygulama verisi hazır olduğunda (veya geç kalırsa 4 saniye sonra) ilk yedeği al.
+    window.addEventListener('stockapp:ready', saveStartupBackup, { once: true });
+    window.setTimeout(saveStartupBackup, 4000);
+
     restoreIfEmpty().then(() => {
-      pushBackup('startup');
       const stored = prefs().lastCheck || 0;
       if (Date.now() - stored > CHECK_INTERVAL_MS) {
         window.setTimeout(() => checkUpdates({ manual: false }), 5000);
@@ -337,9 +361,9 @@
     }).catch(() => {});
 
     window.setInterval(() => pushBackup('auto'), AUTOSAVE_MS);
-    document.addEventListener('pagehide', () => { pushBackup('close'); });
-    window.addEventListener('beforeunload', () => { pushBackup('close'); });
-    desktop.onFlushRequest(() => { pushBackup('close'); });
+    document.addEventListener('pagehide', saveCloseBackup);
+    window.addEventListener('beforeunload', saveCloseBackup);
+    desktop.onFlushRequest(saveCloseBackup);
 
     // Uygulamanın kendi "Yedek al" düğmesi: indirme yerine klasöre yaz.
     document.addEventListener('click', (event) => {

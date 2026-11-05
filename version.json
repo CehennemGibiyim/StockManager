@@ -3,10 +3,11 @@
   "releasedAt": "2026-11-05",
   "notes": [
     "Veriler artık her açılışta aynı yerel adresten yükleniyor; kapatıp açınca kaybolma sorunu giderildi.",
-    "Otomatik yedekleme: kapanışta, 5 dakikada bir ve her manuel yedekte kurulum klasöründeki backups dizinine yazılır.",
-    "Yedekler 7 gün saklanır; 8. güne giren dosyalar açılışta ve her yedekte otomatik silinir.",
-    "Yedekler boşsa uygulama son yedeği kendiliğinden geri yükler; Yardım > Yedekleme ekranından eski bir yedek seçilebilir.",
+    "Otomatik yedekleme: açılışta, kapanışta, 5 dakikada bir ve her manuel yedekte kurulum klasöründeki backups dizinine yazılır.",
+    "Yedekler bugün dahil son 7 takvim günü saklanır; 8. güne giren dosyalar açılışta ve her yedekte otomatik silinir.",
+    "Yedekler boşsa son yedek kendiliğinden geri yüklenir; Yardım > Yedekleme ekranından eski bir yedek seçilebilir.",
     "Yardım > Sürüm notları bölümüne Güncellemeleri denetle düğmesi eklendi; ara sürümler atlanıp doğrudan en yeni sürüme geçilir.",
+    "Güncelleme paketi uygulama içinden indirilip doğrulanır, kurulum sihirbazı açılır ve uygulama kurulum için kapanır.",
     "Bu sürümü atla seçeneği ile istenmeyen sürümler atlanır, daha yenisi çıkınca tekrar sorulur."
   ],
   "installer": {
