@@ -1,1 +1,354 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b14">
+  <meta name="description" content="StockManager — ürün, stok, hareket, alım ve rapor yönetimi. Web ve Windows sürümü.">
+  <title>StockManager — Stok Yönetimi</title>
+  <link rel="icon" type="image/png" href="./assets/brand/icon.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Ana navigasyon">
+      <div class="brand-row">
+        <a class="brand" href="#" data-view="dashboard" aria-label="StockManager ana sayfa">
+          <span class="brand-mark">S<span>M</span></span>
+          <span class="brand-copy"><strong>StockManager</strong><small>Stok &amp; operasyon paneli</small></span>
+        </a>
+        <button class="icon-button sidebar-close" id="sidebarClose" type="button" aria-label="Menüyü kapat"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="workspace-pill"><span class="pulse-dot"></span><span>Yerel çalışma alanı</span><span class="workspace-tag">v1</span></div>
+
+      <nav class="main-nav" aria-label="Bölümler">
+        <div class="nav-label" data-i18n="nav.overviewLabel">Genel bakış</div>
+        <button class="nav-item active" data-view="dashboard" data-tour="nav-dashboard" type="button"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span data-i18n="nav.dashboard">Stok raporu</span></button>
+        <button class="nav-item" data-view="products" data-tour="nav-products" type="button"><span class="nav-icon"><i data-lucide="package"></i></span><span data-i18n="nav.products">Ürünler &amp; stok</span><span class="nav-count" id="productCount">0</span></button>
+        <button class="nav-item" data-view="movements" data-tour="nav-movements" type="button"><span class="nav-icon"><i data-lucide="arrow-left-right"></i></span><span data-i18n="nav.movements">Hareketler</span></button>
+        <button class="nav-item" data-view="purchases" data-tour="nav-purchases" type="button"><span class="nav-icon"><i data-lucide="shopping-cart"></i></span><span data-i18n="nav.purchases">Alımlar</span></button>
+        <button class="nav-item" data-view="suppliers" data-tour="nav-suppliers" type="button"><span class="nav-icon"><i data-lucide="truck"></i></span><span data-i18n="nav.suppliers">Tedarikçiler</span></button>
+        <div class="nav-label nav-label-spaced" data-i18n="nav.insightsLabel">Analiz ve araçlar</div>
+        <button class="nav-item" data-view="pivot" data-tour="nav-pivot" type="button"><span class="nav-icon"><i data-lucide="table-2"></i></span><span data-i18n="nav.pivot">Pivot tablo</span></button>
+        <button class="nav-item" data-view="reports" data-tour="nav-reports" type="button"><span class="nav-icon"><i data-lucide="file-text"></i></span><span data-i18n="nav.reports">Çıktı merkezi</span></button>
+        <button class="nav-item" data-view="backup" data-tour="nav-backup" type="button"><span class="nav-icon"><i data-lucide="database-backup"></i></span><span data-i18n="nav.backup">Yedekleme</span></button>
+        <button class="nav-item" data-view="statistics" data-tour="nav-statistics" type="button"><span class="nav-icon"><i data-lucide="chart-pie"></i></span><span data-i18n="nav.statistics">İstatistikler</span></button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-tip">
+        <span class="sidebar-tip-icon"><i data-lucide="sparkles"></i></span>
+        <div><strong>Rehberli tur</strong><p>Paneli sesli anlatımla keşfedin.</p></div>
+        <button class="mini-button" id="sidebarTourStart" type="button" aria-label="Sesli rehberi başlat"><i data-lucide="play"></i></button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="help-link" data-view="help" data-tour="nav-help" type="button"><span class="nav-icon"><i data-lucide="circle-help"></i></span><span data-i18n="nav.help">Yardım merkezi</span></button>
+        <div class="sidebar-footer">
+          <span class="version-chip" id="appVersion">v1.0.0</span>
+          <a class="footer-link" href="https://github.com/CehennemGibiyim/StockManager" target="_blank" rel="noreferrer"><i data-lucide="git-branch"></i><span>GitHub</span></a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Menüyü aç"><i data-lucide="menu"></i></button>
+        <div class="breadcrumbs"><span class="crumb-root">Panel</span><i data-lucide="chevron-right"></i><strong id="pageCrumb">Stok raporu</strong></div>
+        <div class="topbar-actions">
+          <span class="sync-pill" title="Veriler bu cihazda saklanır"><span class="pulse-dot"></span><span>Yerel veri</span></span>
+          <label class="currency-picker"><span class="sr-only" data-i18n="settings.currency">Para birimi</span><select id="currencySelect" aria-label="Para birimi"><option value="TRY" data-i18n="settings.try">Türk lirası (₺)</option><option value="EUR" data-i18n="settings.eur">Euro (€)</option><option value="USD" data-i18n="settings.usd">Dolar ($)</option></select></label>
+          <label class="global-search"><span class="search-icon"><i data-lucide="search"></i></span><input id="globalSearch" type="search" placeholder="Ürünlerde ara..." data-i18n-placeholder="common.search"><kbd>Ctrl K</kbd></label>
+          <a class="icon-button ghost-button desktop-only" href="https://github.com/CehennemGibiyim/StockManager" target="_blank" rel="noreferrer" aria-label="GitHub deposu"><i data-lucide="git-branch"></i></a>
+          <span class="version-chip top-version" id="appVersionTop">v1.0.0</span>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <section class="view active" id="view-dashboard" aria-labelledby="dashboardTitle">
+          <div class="view-heading">
+            <div>
+              <div class="eyebrow" data-i18n="dashboard.eyebrow">GENEL BAKIŞ</div>
+              <h1 id="dashboardTitle">Stok raporu</h1>
+              <p data-i18n="dashboard.subtitle">Operasyonunuzu tek bakışta takip edin.</p>
+              <div class="dashboard-title-editor"><label for="dashboardTitleInput" data-i18n="settings.panelTitle">Panel başlığı</label><div><input id="dashboardTitleInput" type="text" maxlength="60" placeholder="Örn. Firma adı" data-i18n-placeholder="settings.panelTitlePlaceholder"><button class="secondary-button" id="dashboardTitleSave" type="button" data-i18n="settings.saveTitle">Başlığı kaydet</button></div></div>
+            </div>
+            <button class="primary-button" id="dashboardAdd" type="button" data-tour="add-product"><span class="button-icon"><i data-lucide="plus"></i></span><span data-i18n="actions.addProduct">Ürün ekle</span></button>
+          </div>
+          <div class="metric-grid" id="metricGrid"></div>
+          <div class="dashboard-grid">
+            <article class="panel-card stock-health-card">
+              <div class="card-heading"><div><h2 data-i18n="dashboard.healthTitle">Stok sağlığı</h2><p data-i18n="dashboard.healthSubtitle">Minimum seviyenin altındaki ürünler</p></div><button class="text-button" data-view="products" type="button" data-i18n="actions.viewAll">Tümünü gör →</button></div>
+              <div id="stockHealth"></div>
+            </article>
+            <article class="panel-card activity-card">
+              <div class="card-heading"><div><h2 data-i18n="dashboard.activityTitle">Son hareketler</h2><p data-i18n="dashboard.activitySubtitle">En güncel stok değişiklikleri</p></div><button class="text-button" data-view="movements" type="button" data-i18n="actions.viewAll">Tümünü gör →</button></div>
+              <div id="recentActivity"></div>
+            </article>
+          </div>
+          <article class="panel-card insight-banner">
+            <div class="insight-icon"><i data-lucide="sparkles"></i></div>
+            <div><strong data-i18n="dashboard.insightTitle">Günün özeti hazır</strong><p id="insightText"></p></div>
+            <button class="secondary-button" data-view="reports" type="button" data-i18n="actions.openReports">Raporlara git</button>
+          </article>
+        </section>
+
+        <section class="view" id="view-products" aria-labelledby="productsTitle" hidden>
+          <div class="view-heading">
+            <div><div class="eyebrow" data-i18n="products.eyebrow">KATALOG</div><h1 id="productsTitle" data-i18n="products.title">Ürünler &amp; stok</h1><p data-i18n="products.subtitle">Ürün kataloğunuzu, fiyatlarınızı ve stok seviyelerinizi yönetin.</p></div>
+            <button class="primary-button" id="productAdd" type="button" data-tour="add-product-page"><span class="button-icon"><i data-lucide="plus"></i></span><span data-i18n="actions.addProduct">Ürün ekle</span></button>
+          </div>
+          <div class="toolbar">
+            <label class="field search-field"><span class="search-icon"><i data-lucide="search"></i></span><input id="productSearch" type="search" placeholder="Ürün adı veya stok kodu ara..." data-i18n-placeholder="products.searchPlaceholder"></label>
+            <select id="stockFilter" aria-label="Stok filtresi"><option value="all" data-i18n="filters.allStock">Tüm stok durumu</option><option value="healthy" data-i18n="filters.healthy">Stokta</option><option value="low" data-i18n="filters.low">Kritik seviye</option><option value="out" data-i18n="filters.out">Tükendi</option></select>
+            <button class="secondary-button export-products" type="button"><i data-lucide="download"></i><span data-i18n="actions.exportCsv">CSV dışa aktar</span></button>
+          </div>
+          <article class="panel-card table-card">
+            <div class="table-summary"><strong id="productSummary"></strong><span data-i18n="products.summaryHint">Stok durumu canlı olarak hesaplanır</span></div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr>
+                  <th><button class="sort-button" data-sort="name" type="button"><span data-i18n="table.product">Ürün</span><span class="sort-mark"><i data-lucide="chevrons-up-down"></i></span></button></th>
+                  <th><button class="sort-button" data-sort="sku" type="button"><span data-i18n="table.sku">Stok kodu</span><span class="sort-mark"><i data-lucide="chevrons-up-down"></i></span></button></th>
+                  <th><button class="sort-button" data-sort="category" type="button"><span data-i18n="table.category">Kategori</span><span class="sort-mark"><i data-lucide="chevrons-up-down"></i></span></button></th>
+                  <th><button class="sort-button" data-sort="stock" type="button"><span data-i18n="table.stock">Stok</span><span class="sort-mark"><i data-lucide="chevrons-up-down"></i></span></button></th>
+                  <th><button class="sort-button" data-sort="minStock" type="button"><span data-i18n="table.min">Alt limit</span><span class="sort-mark"><i data-lucide="chevrons-up-down"></i></span></button></th>
+                  <th><button class="sort-button" data-sort="unitPrice" type="button"><span data-i18n="table.unitPrice">Birim fiyat</span><span class="sort-mark"><i data-lucide="chevrons-up-down"></i></span></button></th>
+                  <th></th>
+                </tr></thead>
+                <tbody id="productsTable"></tbody>
+              </table>
+            </div>
+            <div class="empty-state" id="productsEmpty" hidden><div class="empty-icon"><i data-lucide="package-open"></i></div><h3 data-i18n="empty.productsTitle">Henüz ürün yok</h3><p data-i18n="empty.productsText">İlk ürününüzü ekleyerek stok takibine başlayın.</p><button class="primary-button" id="emptyProductAdd" type="button" data-i18n="actions.addFirst">İlk ürünü ekle</button></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-movements" aria-labelledby="movementsTitle" hidden>
+          <div class="view-heading">
+            <div><div class="eyebrow" data-i18n="movements.eyebrow">STOK AKIŞI</div><h1 id="movementsTitle" data-i18n="movements.title">Hareketler</h1><p data-i18n="movements.subtitle">Giriş ve çıkışları kaydedin, stok akışını izleyin.</p></div>
+            <button class="primary-button" id="movementAdd" type="button" data-tour="add-movement"><span class="button-icon"><i data-lucide="plus"></i></span><span data-i18n="actions.addMovement">Hareket ekle</span></button>
+          </div>
+          <div class="metric-grid compact" id="movementMetrics"></div>
+          <div class="toolbar movement-toolbar">
+            <label class="field search-field"><span class="search-icon"><i data-lucide="search"></i></span><input id="movementSearch" type="search" placeholder="Ürün adı ara..." data-i18n-placeholder="movements.searchPlaceholder"></label>
+            <label class="date-filter"><span data-i18n="movements.from">Başlangıç</span><input id="movementFrom" type="date"></label>
+            <label class="date-filter"><span data-i18n="movements.to">Bitiş</span><input id="movementTo" type="date"></label>
+            <button class="secondary-button" id="movementPrint" type="button"><i data-lucide="printer"></i><span data-i18n="actions.printResults">Sonuçları yazdır</span></button>
+          </div>
+          <article class="panel-card table-card">
+            <div class="table-summary"><strong data-i18n="movements.tableTitle">Hareket geçmişi</strong><span id="movementSummary"></span></div>
+            <div class="table-scroll"><table><thead><tr><th data-i18n="table.date">Tarih</th><th data-i18n="table.product">Ürün</th><th data-i18n="table.type">İşlem</th><th data-i18n="table.quantity">Paket adeti</th><th data-i18n="table.note">Not</th></tr></thead><tbody id="movementsTable"></tbody></table></div>
+            <div class="empty-state" id="movementsEmpty" hidden><div class="empty-icon"><i data-lucide="arrow-left-right"></i></div><h3 data-i18n="empty.movementsTitle">Hareket bulunamadı</h3><p data-i18n="empty.movementsText">Stok giriş veya çıkışı eklediğinizde burada görünecek.</p></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-purchases" aria-labelledby="purchasesTitle" hidden>
+          <div class="view-heading">
+            <div><div class="eyebrow" data-i18n="purchases.eyebrow">TEDARİK</div><h1 id="purchasesTitle" data-i18n="purchases.title">Alımlar</h1><p data-i18n="purchases.subtitle">Tedarikçi alımlarınızı ve maliyetlerinizi kayıt altında tutun.</p></div>
+            <button class="primary-button" id="purchaseAdd" type="button" data-tour="add-purchase"><span class="button-icon"><i data-lucide="plus"></i></span><span data-i18n="actions.addPurchase">Alım ekle</span></button>
+          </div>
+          <div class="metric-grid compact" id="purchaseMetrics"></div>
+          <article class="panel-card table-card">
+            <div class="table-summary"><strong data-i18n="purchases.tableTitle">Alım kayıtları</strong><span id="purchaseSummary"></span></div>
+            <div class="table-scroll"><table><thead><tr><th data-i18n="table.date">Tarih</th><th data-i18n="table.product">Ürün</th><th data-i18n="table.supplier">Tedarikçi</th><th data-i18n="table.quantity">Paket adeti</th><th data-i18n="table.total">Toplam</th><th data-i18n="table.note">Not</th><th data-i18n="table.status">Durum</th><th></th></tr></thead><tbody id="purchasesTable"></tbody></table></div>
+            <div class="empty-state" id="purchasesEmpty" hidden><div class="empty-icon"><i data-lucide="shopping-cart"></i></div><h3 data-i18n="empty.purchasesTitle">Henüz alım yok</h3><p data-i18n="empty.purchasesText">İlk alım kaydınızı ekleyerek maliyet takibine başlayın.</p></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-suppliers" aria-labelledby="suppliersTitle" hidden>
+          <div class="view-heading">
+            <div><div class="eyebrow" data-i18n="suppliers.eyebrow">TEDARİKÇİLER</div><h1 id="suppliersTitle" data-i18n="suppliers.title">Tedarikçiler</h1><p data-i18n="suppliers.subtitle">Hangi tedarikçiden ne kadar alışveriş yaptığınızı ayrı ayrı görün.</p></div>
+            <button class="secondary-button" id="suppliersExport" type="button"><i data-lucide="download"></i><span data-i18n="actions.exportCsv">CSV dışa aktar</span></button>
+          </div>
+          <div class="metric-grid compact" id="supplierMetrics"></div>
+          <article class="panel-card table-card">
+            <div class="table-summary"><strong data-i18n="suppliers.tableTitle">Tedarikçi özeti</strong><span id="supplierSummary"></span></div>
+            <div class="table-scroll"><table><thead><tr><th data-i18n="table.supplier">Tedarikçi</th><th data-i18n="table.purchaseCount">Alım kaydı</th><th data-i18n="table.quantity">Paket adeti</th><th data-i18n="table.total">Toplam alışveriş</th><th data-i18n="table.lastPurchase">Son alım</th></tr></thead><tbody id="suppliersTable"></tbody></table></div>
+            <div class="empty-state" id="suppliersEmpty" hidden><div class="empty-icon"><i data-lucide="truck"></i></div><h3 data-i18n="empty.suppliersTitle">Henüz tedarikçi yok</h3><p data-i18n="empty.suppliersText">Alım kaydettiğinizde tedarikçi özetleri burada görünecek.</p></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-pivot" aria-labelledby="pivotTitle" hidden>
+          <div class="view-heading">
+            <div><div class="eyebrow" data-i18n="pivot.eyebrow">ANALİZ</div><h1 id="pivotTitle" data-i18n="pivot.title">Pivot tablo</h1><p data-i18n="pivot.subtitle">Kategori ve hareket tipine göre özet görünüm alın.</p></div>
+            <button class="secondary-button" id="pivotExport" type="button"><i data-lucide="download"></i><span data-i18n="actions.exportCsv">CSV dışa aktar</span></button>
+          </div>
+          <div class="toolbar"><select id="pivotPeriod" aria-label="Pivot dönemi"><option value="all" data-i18n="filters.allTime">Tüm dönem</option><option value="month" data-i18n="filters.thisMonth">Bu ay</option></select><select id="pivotGroup" aria-label="Pivot gruplama"><option value="category" data-i18n="filters.byCategory">Kategoriye göre</option><option value="product" data-i18n="filters.byProduct">Ürüne göre</option></select></div>
+          <article class="panel-card table-card"><div class="table-scroll"><table><thead><tr><th id="pivotGroupHead" data-i18n="table.category">Kategori</th><th data-i18n="table.inbound">Giriş</th><th data-i18n="table.outbound">Çıkış</th><th data-i18n="table.net">Net değişim</th><th data-i18n="table.currentStock">Mevcut stok</th></tr></thead><tbody id="pivotTable"></tbody></table></div></article>
+        </section>
+
+        <section class="view" id="view-reports" aria-labelledby="reportsTitle" hidden>
+          <div class="view-heading">
+            <div><div class="eyebrow" data-i18n="reports.eyebrow">ÇIKTILAR</div><h1 id="reportsTitle" data-i18n="reports.title">Çıktı merkezi</h1><p data-i18n="reports.subtitle">Tablo ve raporları ayrı bir alandan dışa aktarın veya A4 olarak yazdırın.</p></div>
+          </div>
+          <div class="report-grid">
+            <article class="report-card"><div class="report-art orange"><i data-lucide="table-2"></i></div><h3 data-i18n="reports.stockTitle">Stok durum raporu</h3><p data-i18n="reports.stockText">Mevcut, kritik ve tükenen ürünlerin tablo çıktısı.</p><button class="secondary-button report-stock" type="button"><i data-lucide="download"></i><span data-i18n="actions.downloadCsv">CSV indir</span></button></article>
+            <article class="report-card"><div class="report-art blue"><i data-lucide="file-text"></i></div><h3 data-i18n="reports.movementTitle">Hareket raporu</h3><p data-i18n="reports.movementText">Filtrelediğiniz tarih ve ürün sonucunu tablo olarak alın.</p><button class="secondary-button report-movement" type="button"><i data-lucide="printer"></i><span data-i18n="actions.printResults">Hareketleri yazdır</span></button></article>
+            <article class="report-card"><div class="report-art green"><i data-lucide="file-spreadsheet"></i></div><h3 data-i18n="reports.printTitle">A4 stok özeti</h3><p data-i18n="reports.printText">Ürün, stok ve değer bilgilerini tam sayfa tablo olarak yazdırın.</p><button class="secondary-button print-report" type="button"><i data-lucide="printer"></i><span data-i18n="actions.print">Yazdır</span></button></article>
+            <article class="report-card"><div class="report-art violet"><i data-lucide="receipt-text"></i></div><h3 data-i18n="reports.purchaseTitle">Alım kayıtları</h3><p data-i18n="reports.purchaseText">Kaydedilmiş alımları tedarikçi, not ve toplamlarıyla yazdırın.</p><button class="secondary-button report-purchases" type="button"><i data-lucide="printer"></i><span data-i18n="actions.print">Yazdır</span></button></article>
+            <article class="report-card"><div class="report-art blue"><i data-lucide="truck"></i></div><h3 data-i18n="reports.supplierTitle">Tedarikçi raporu</h3><p data-i18n="reports.supplierText">Tedarikçi bazında alım adedi, paket ve toplam alışveriş özeti.</p><div class="report-actions"><button class="secondary-button report-suppliers-csv" type="button"><i data-lucide="download"></i><span data-i18n="actions.downloadCsv">CSV indir</span></button><button class="secondary-button report-suppliers-print" type="button"><i data-lucide="printer"></i><span data-i18n="actions.print">Yazdır</span></button></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-statistics" aria-labelledby="statisticsTitle" hidden>
+          <div class="view-heading"><div><div class="eyebrow" data-i18n="statistics.eyebrow">PERFORMANS</div><h1 id="statisticsTitle" data-i18n="statistics.title">İstatistikler</h1><p data-i18n="statistics.subtitle">Stok hareketlerini ve kategori dağılımını grafiklerle okuyun.</p></div></div>
+          <div class="metric-grid compact" id="statisticsMetrics"></div>
+          <div class="statistics-grid">
+            <article class="panel-card chart-card"><div class="card-heading"><div><h2 data-i18n="statistics.barTitle">Son 6 dönem hareketi</h2><p data-i18n="statistics.barSubtitle">Giriş ve çıkış paket adetleri</p></div></div><div class="bar-chart" id="statisticsBars" role="img" aria-label="Hareket grafiği"></div><div class="chart-legend"><span><i class="legend-dot inbound"></i><span data-i18n="status.inbound">Giriş</span></span><span><i class="legend-dot outbound"></i><span data-i18n="status.outbound">Çıkış</span></span></div></article>
+            <article class="panel-card chart-card"><div class="card-heading"><div><h2 data-i18n="statistics.circleTitle">Stok dağılımı</h2><p data-i18n="statistics.circleSubtitle">Kategorilere göre mevcut paketler</p></div></div><div class="donut-wrap"><div class="donut-chart" id="categoryChart" role="img" aria-label="Kategori stok dağılımı"><span id="categoryChartTotal"></span></div><div class="donut-legend" id="categoryLegend"></div></div></article>
+          </div>
+          <article class="panel-card statistics-note"><strong data-i18n="statistics.noteTitle">Bu ekran ne anlatır?</strong><p data-i18n="statistics.noteText">Çizelge dönemsel giriş–çıkış hızını, çember grafik ise mevcut stok paketlerinin kategori payını gösterir.</p></article>
+        </section>
+
+        <section class="view" id="view-backup" aria-labelledby="backupTitle" hidden>
+          <div class="view-heading"><div><div class="eyebrow" data-i18n="backup.eyebrow">GÜVENLİ VERİ</div><h1 id="backupTitle" data-i18n="backup.title">Yedekleme</h1><p data-i18n="backup.subtitle">Verilerinizi dışa aktarın veya daha önce aldığınız yedeği geri yükleyin.</p></div></div>
+          <div class="backup-grid">
+            <article class="panel-card backup-card"><div class="backup-icon"><i data-lucide="download"></i></div><h2 data-i18n="backup.exportTitle">Yedeği dışa aktar</h2><p data-i18n="backup.exportText">Ürün, hareket ve alım kayıtlarını tek bir JSON dosyası olarak indirin.</p><button class="primary-button backup-export" type="button"><i data-lucide="database-backup"></i><span data-i18n="actions.downloadBackup">JSON yedeği indir</span></button><small id="lastBackup"></small></article>
+            <article class="panel-card backup-card"><div class="backup-icon upload"><i data-lucide="upload"></i></div><h2 data-i18n="backup.importTitle">Yedek geri yükle</h2><p data-i18n="backup.importText">JSON yedek dosyanızı seçin. Mevcut verilerinizin üzerine yazılır.</p><label class="secondary-button file-button"><i data-lucide="folder-open"></i><span data-i18n="actions.chooseFile">Dosya seç</span><input id="backupInput" type="file" accept="application/json"></label><small data-i18n="backup.importHint">Yalnızca bu panelden alınan JSON yedekleri kabul edilir.</small></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-help" aria-labelledby="helpTitle" hidden>
+          <div class="view-heading help-heading">
+            <div><div class="eyebrow" data-i18n="help.eyebrow">DESTEK</div><h1 id="helpTitle" data-i18n="help.title">Yardım merkezi</h1><p data-i18n="help.subtitle">Paneli kullanmaya hızlıca başlayın.</p></div>
+            <span class="help-heading-badge"><span class="badge-dot"></span><span data-i18n="help.readyBadge">Kullanıma hazır rehber</span></span>
+          </div>
+
+          <article class="panel-card tour-hero" id="helpTourCard">
+            <div class="tour-hero-copy">
+              <div class="help-kicker"><i data-lucide="audio-lines"></i><span>SESLİ VE HAREKETLİ ANLATIM</span></div>
+              <h2>Paneli 90 saniyede, sesli rehberle öğrenin</h2>
+              <p>Rehber sırayla ekranları açar, ilgili düğmeyi ışıltıyla işaret eder ve her adımı Türkçe sesli olarak anlatır. Sesiniz kapalıysa altyazılar aynı akışı takip eder.</p>
+              <div class="tour-hero-actions">
+                <button class="primary-button" id="startTour" type="button"><span class="button-icon"><i data-lucide="play"></i></span><span>Rehberi başlat</span></button>
+                <button class="secondary-button" id="tourVoicePreview" type="button"><i data-lucide="volume-2"></i><span>Sesi dene</span></button>
+                <span class="tour-duration"><i data-lucide="clock"></i><span>~90 saniye · 9 adım</span></span>
+              </div>
+            </div>
+            <div class="tour-hero-visual" aria-hidden="true">
+              <div class="tour-orbit orbit-one"></div>
+              <div class="tour-orbit orbit-two"></div>
+              <div class="tour-play"><i data-lucide="play"></i></div>
+              <div class="tour-float float-one"><i data-lucide="package"></i><span>Ürünler</span></div>
+              <div class="tour-float float-two"><i data-lucide="trending-up"></i><span>Raporlar</span></div>
+              <div class="tour-float float-three"><i data-lucide="volume-2"></i><span>Türkçe ses</span></div>
+            </div>
+          </article>
+
+          <div class="help-section-heading">
+            <div><div class="eyebrow">RESİMLİ ANLATIMLAR</div><h2>Ekran görüntüleriyle adım adım kılavuz</h2></div>
+            <p>Her kılavuz gerçek panel görüntüsü, numaralı işaretler ve kısa açıklamalar içerir. Karta tıklayarak büyütün.</p>
+          </div>
+          <div class="help-guide-grid" id="helpGuideGrid" aria-live="polite"></div>
+
+          <div class="help-two-col">
+            <article class="panel-card help-flow">
+              <div class="help-flow-title"><div class="eyebrow">ÖNERİLEN SIRA</div><h2>İlk kullanımda şu akışı izleyin</h2><p>Bir kez kurun, sonra günlük operasyonu birkaç tıklamayla yönetin.</p></div>
+              <div class="help-flow-steps">
+                <div><span>1</span><strong>Ürün ekle</strong><small>Katalog temelini oluştur.</small></div>
+                <div><span>2</span><strong>Alım kaydet</strong><small>Gelen stoğu ekle.</small></div>
+                <div><span>3</span><strong>Hareket gir</strong><small>Kullanımı takip et.</small></div>
+                <div><span>4</span><strong>Raporla</strong><small>Sonucu paylaş.</small></div>
+              </div>
+            </article>
+
+            <article class="panel-card release-card" id="releaseCard">
+              <div class="card-heading"><div><h2>Sürüm notları</h2><p>Güncel kurulum paketi ve yenilikler.</p></div><span class="version-chip" id="releaseVersion">v1.0.0</span></div>
+              <ul class="release-notes" id="versionNotesList"><li>Yeni arayüz ve sesli rehber hazırlanıyor.</li></ul>
+              <div class="release-actions">
+                <a class="primary-button" id="downloadInstaller" href="https://github.com/CehennemGibiyim/StockManager/releases/latest" target="_blank" rel="noreferrer"><i data-lucide="monitor-down"></i><span>Windows kurulum paketi</span></a>
+                <a class="secondary-button" href="https://cehennemgibiyim.github.io/StockManager/" target="_blank" rel="noreferrer"><i data-lucide="globe"></i><span>Web sürümü</span></a>
+              </div>
+              <p class="release-hint" id="releaseHint">Kurulum paketi GitHub Releases sayfasından indirilir. Verileriniz bilgisayarınızda kalır.</p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="app-footer">
+          <span>StockManager <span id="footerVersion">v1.0.0</span> · Yerel veri, bulut hesabı gerekmez.</span>
+          <span class="footer-links"><a href="./version.json" target="_blank">Sürüm bilgisi</a><a href="https://github.com/CehennemGibiyim/StockManager" target="_blank" rel="noreferrer">GitHub</a></span>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="guideModalBackdrop" hidden>
+    <section class="modal guide-modal" role="dialog" aria-modal="true" aria-labelledby="guideModalTitle">
+      <div class="modal-header">
+        <div><div class="eyebrow">RESİMLİ ANLATIM</div><h2 id="guideModalTitle">Kılavuz</h2></div>
+        <button class="icon-button modal-close" id="guideModalClose" type="button" aria-label="Pencereyi kapat"><i data-lucide="x"></i></button>
+      </div>
+      <div class="guide-modal-body">
+        <div class="guide-shot-wrap">
+          <img id="guideModalImage" class="guide-shot" alt="Panel ekran görüntüsü" loading="lazy">
+          <div class="guide-markers" id="guideMarkers"></div>
+        </div>
+        <ol class="guide-step-list" id="guideStepList"></ol>
+      </div>
+    </section>
+  </div>
+
+  <div class="tour-overlay" id="tourOverlay" hidden>
+    <div class="tour-spotlight" id="tourSpotlight" aria-hidden="true"></div>
+    <div class="tour-tooltip" id="tourTooltip" role="dialog" aria-modal="true" aria-labelledby="tourStepTitle">
+      <div class="tour-tooltip-top">
+        <span class="tour-badge"><i data-lucide="audio-lines"></i><span>Sesli rehber</span></span>
+        <span class="tour-step-count" id="tourStepCount">1 / 9</span>
+      </div>
+      <h3 id="tourStepTitle">Hoş geldiniz</h3>
+      <p id="tourStepText"></p>
+      <div class="tour-progress"><span id="tourProgressBar"></span></div>
+      <div class="tour-controls">
+        <button class="icon-button" id="tourPrev" type="button" aria-label="Önceki adım"><i data-lucide="chevron-left"></i></button>
+        <button class="tour-play-button" id="tourPlayPause" type="button" aria-label="Duraklat"><i data-lucide="pause"></i></button>
+        <button class="icon-button" id="tourNext" type="button" aria-label="Sonraki adım"><i data-lucide="chevron-right"></i></button>
+        <span class="tour-spacer"></span>
+        <button class="icon-button" id="tourVoiceToggle" type="button" aria-label="Sesi kapat" title="Sesi aç/kapat"><i data-lucide="volume-2"></i></button>
+        <button class="secondary-button tour-close" id="tourClose" type="button"><span>Kapat</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header"><div><div class="eyebrow" id="modalEyebrow">YENİ KAYIT</div><h2 id="modalTitle">Ürün ekle</h2></div><button class="icon-button modal-close" id="modalClose" type="button" aria-label="Pencereyi kapat"><i data-lucide="x"></i></button></div>
+      <form id="recordForm">
+        <div id="productFields" class="form-grid">
+          <label class="form-control full"><span data-i18n="form.productName">Ürün adı</span><input name="name" required placeholder="Örn. Kraft kahve bardağı"></label>
+          <label class="form-control"><span data-i18n="form.sku">Stok kodu</span><input name="sku" required placeholder="STK-001"></label>
+          <label class="form-control"><span data-i18n="form.category">Kategori</span><input name="category" required placeholder="Ambalaj"></label>
+          <label class="form-control"><span data-i18n="form.stock">Mevcut stok</span><input name="stock" type="number" min="0" required></label>
+          <label class="form-control"><span data-i18n="form.minStock">Alt limit</span><input name="minStock" type="number" min="0" required></label>
+          <label class="form-control"><span data-i18n="form.unitPrice">Birim fiyat</span><input name="unitPrice" type="number" min="0" step="0.01" required></label>
+          <label class="form-control"><span data-i18n="form.currency">Para birimi</span><select name="currency" class="record-currency"><option value="TRY" data-i18n="settings.try">Türk lirası (₺)</option><option value="EUR" data-i18n="settings.eur">Euro (€)</option><option value="USD" data-i18n="settings.usd">Dolar ($)</option></select></label>
+        </div>
+        <div id="movementFields" class="form-grid" hidden>
+          <label class="form-control full"><span data-i18n="form.product">Ürün</span><select name="productId" id="movementProduct"></select></label>
+          <label class="form-control"><span data-i18n="form.movementType">İşlem</span><select name="type"><option value="in" data-i18n="form.inbound">Stok girişi</option><option value="out" data-i18n="form.outbound">Stok çıkışı</option></select></label>
+          <label class="form-control"><span data-i18n="form.quantity">Paket adeti</span><input name="quantity" type="number" min="1" required></label>
+          <label class="form-control full"><span data-i18n="form.note">Not</span><input name="note" placeholder="İsteğe bağlı açıklama"></label>
+        </div>
+        <div id="purchaseFields" class="form-grid" hidden>
+          <label class="form-control full"><span data-i18n="form.product">Ürün</span><select name="productId" id="purchaseProduct"></select></label>
+          <label class="form-control"><span data-i18n="form.supplier">Tedarikçi</span><input name="supplier" required placeholder="Tedarikçi adı"></label>
+          <label class="form-control"><span data-i18n="form.quantity">Paket adeti</span><input name="quantity" type="number" min="1" required></label>
+          <label class="form-control"><span data-i18n="form.purchasePrice">Birim maliyet</span><input name="unitPrice" type="number" min="0" step="0.01" required></label>
+          <label class="form-control"><span data-i18n="form.currency">Para birimi</span><select name="currency" class="record-currency"><option value="TRY" data-i18n="settings.try">Türk lirası (₺)</option><option value="EUR" data-i18n="settings.eur">Euro (€)</option><option value="USD" data-i18n="settings.usd">Dolar ($)</option></select></label>
+          <label class="form-control full"><span data-i18n="form.note">Not</span><input name="note" placeholder="Alım notu"></label>
+        </div>
+        <div class="form-actions"><button class="secondary-button modal-cancel" type="button" data-i18n="actions.cancel">Vazgeç</button><button class="primary-button" type="submit" data-i18n="actions.save">Kaydet</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./vendor/lucide.min.js"></script>
+  <script src="./help.js" defer></script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
