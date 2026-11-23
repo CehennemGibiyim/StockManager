@@ -48,4 +48,13 @@ const sizeOf = (directory) => fs.readdirSync(directory, { withFileTypes: true })
 
 const bytes = sizeOf(out);
 const version = JSON.parse(fs.readFileSync(path.join(root, 'version.json'), 'utf8'));
-console.log(`Web sürümü hazır: dist/web (${(bytes / 1024).toFixed(0)} KB, v${version.version})`);
+
+// Canlıda hangi commit'in yayında olduğunu görebilmek için işaret dosyası.
+// GitHub Actions GITHUB_SHA değişkenini sağlar; yerel derlemede "unknown" yazılır.
+const commit = process.env.GITHUB_SHA || 'unknown';
+fs.writeFileSync(
+  path.join(out, 'build.json'),
+  `${JSON.stringify({ commit, version: version.version, builtAt: new Date().toISOString() }, null, 2)}\n`,
+);
+
+console.log(`Web sürümü hazır: dist/web (${(bytes / 1024).toFixed(0)} KB, v${version.version}, commit ${commit.slice(0, 7)})`);
