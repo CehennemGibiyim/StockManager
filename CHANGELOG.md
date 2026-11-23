@@ -2,6 +2,12 @@
 
 Tüm önemli değişiklikler bu dosyada tutulur. Kurulum paketleri GitHub Releases sayfasından indirilir.
 
+## [1.1.1] - 2026-11-23
+
+- Web sürümü yayını otomatik doğrulanıyor: canlı sayfa, sürüm ve commit bilgisi kontrol edilip uyuşmazsa yayın başarısız sayılıyor.
+- Canlı site kontrolü günde bir kez de çalışıyor; site kapalıysa ya da eski sürümü sunuyorsa fark ediliyor.
+- Uygulama davranışında değişiklik yok; bu sürüm yayın ve doğrulama altyapısını günceller.
+
 ## [1.1.0] - 2026-11-05
 
 ### Düzeltildi
