@@ -3,19 +3,18 @@ name: Web sürümünü yayınla
 on:
   push:
     branches: [main]
-    paths:
-      - 'index.html'
-      - 'styles.css'
-      - 'main.js'
-      - 'help.js'
-      - 'src/**'
-      - 'help/**'
-      - 'locales/**'
-      - 'assets/**'
-      - 'vendor/**'
-      - 'version.json'
-      - 'scripts/build-web.mjs'
-      - '.github/workflows/pages.yml'
+    # Bilinçli olarak paths yerine paths-ignore: varsayılan davranış "deploy et"
+    # olduğu için, listeye yazılmayı unutulan yeni bir site klasörü de yayına girer.
+    # Burada yalnızca sitenin çıktısını etkilemeyen dosyalar sayılır.
+    paths-ignore:
+      - 'electron/**'
+      - 'scripts/gen-icon.mjs'
+      - 'scripts/release.mjs'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/live-site-check.yml'
+      - 'README.MD'
+      - 'CHANGELOG.md'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:
@@ -56,8 +55,9 @@ jobs:
         uses: actions/deploy-pages@v4
 
       # Dağıtım sonrası canlı sitenin gerçekten yayında olduğunu doğrular.
-      # Not: yukarıdaki paths filtresi nedeniyle bu kontrol yalnızca site
-      # dosyaları değiştiğinde (Pages workflow'u tetiklendiğinde) çalışır.
+      # Not: yukarıdaki paths-ignore listesi nedeniyle bu kontrol yalnızca push
+      # sadece site dışı dosyaları değiştirdiğinde çalışmaz; diğer tüm
+      # push'larda (yeni bir site klasörü dahil) dağıtım tetiklenir.
       - name: Canlı siteyi doğrula (HTTP 200, eksiksiz index.html, sürüm ve commit)
         shell: bash
         timeout-minutes: 10
