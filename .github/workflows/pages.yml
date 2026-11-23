@@ -53,4 +53,26 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      # Dağıtım sonrası canlı sitenin gerçekten yayında olduğunu doğrular.
+      # Not: yukarıdaki paths filtresi nedeniyle bu kontrol yalnızca site
+      # dosyaları değiştiğinde (Pages workflow'u tetiklendiğinde) çalışır.
+      - name: Canlı siteyi doğrula (HTTP 200)
+        shell: bash
+        timeout-minutes: 10
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          echo "Kontrol edilen adres: $PAGE_URL"
+          for attempt in $(seq 1 15); do
+            code=$(curl -sS -o /dev/null -L --max-time 15 --write-out '%{http_code}' "$PAGE_URL" || true)
+            echo "$attempt/15 deneme -> HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "Dağıtım doğrulandı: $PAGE_URL (HTTP 200)"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Dağıtım doğrulanamadı: $PAGE_URL HTTP 200 döndürmedi"
+          exit 1
 # GitHub Actions ile dist/web çıktısını yayınlar.
