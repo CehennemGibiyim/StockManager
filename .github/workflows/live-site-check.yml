@@ -1,0 +1,34 @@
+name: Canlı site kontrolü
+
+# Her push'ta canlı yayının ayakta olduğunu kontrol eder.
+# Build/deploy yapmaz, yalnızca HTTP 200 bakar.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Canlı site erişilebilir mi (HTTP 200)
+        shell: bash
+        timeout-minutes: 10
+        env:
+          PAGE_URL: https://cehennemgibiyim.github.io/StockManager/
+        run: |
+          echo "Kontrol edilen adres: $PAGE_URL"
+          for attempt in $(seq 1 15); do
+            code=$(curl -sS -o /dev/null -L --max-time 15 --write-out '%{http_code}' "$PAGE_URL" || true)
+            echo "$attempt/15 deneme -> HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "Canlı site yayında: $PAGE_URL (HTTP 200)"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Canlı site yanıt vermedi: $PAGE_URL HTTP 200 dönmedi"
+          exit 1
