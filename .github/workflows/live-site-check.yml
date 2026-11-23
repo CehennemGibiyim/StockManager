@@ -5,6 +5,9 @@ name: Canlı site kontrolü
 on:
   push:
     branches: [main]
+  schedule:
+    # Her gün 06:00 UTC (09:00 Türkiye): push yapılmayan dönemlerde de kontrol edilir.
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:
