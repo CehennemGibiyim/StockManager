@@ -85,7 +85,9 @@ jobs:
             [ "$live_commit" = "$EXPECTED_COMMIT" ] || ok=0
 
             for file in "${critical_files[@]}"; do
-              read -r file_code file_size < <(curl -sS -L --max-time 15 -o /dev/null --write-out '%{http_code} %{size_download}' "$base/$file" || echo "000 0")
+              file_result=$(curl -sS -L --max-time 15 -o /dev/null --write-out '%{http_code} %{size_download}' "$base/$file" || echo "000 0")
+              file_code=${file_result%% *}
+              file_size=${file_result##* }
               echo "  $file -> HTTP $file_code, $file_size bayt"
               [ "$file_code" = "200" ] && [ "$file_size" -gt 0 ] || ok=0
             done
