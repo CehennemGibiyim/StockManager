@@ -58,7 +58,7 @@ jobs:
       # Not: yukarıdaki paths-ignore listesi nedeniyle bu kontrol yalnızca push
       # sadece site dışı dosyaları değiştirdiğinde çalışmaz; diğer tüm
       # push'larda (yeni bir site klasörü dahil) dağıtım tetiklenir.
-      - name: Canlı siteyi doğrula (HTTP 200, eksiksiz index.html, sürüm ve commit)
+      - name: Canlı siteyi doğrula (sayfa, sürüm, commit, varlıklar, derin bağlantı)
         shell: bash
         timeout-minutes: 10
         env:
@@ -67,20 +67,41 @@ jobs:
           RUN_ID: ${{ github.run_id }}
         run: |
           set -o pipefail
+          base="${PAGE_URL%/}"
           expected_version=$(jq -r .version version.json)
-          echo "Kontrol edilen adres: $PAGE_URL (beklenen sürüm: $expected_version, beklenen commit: ${EXPECTED_COMMIT:0:7})"
+          critical_files=(main.js styles.css locales/tr.json)
+          echo "Kontrol edilen adres: $base (beklenen sürüm: $expected_version, beklenen commit: ${EXPECTED_COMMIT:0:7})"
+
           for attempt in $(seq 1 15); do
-            code=$(curl -sS -o /dev/null -L --max-time 15 --write-out '%{http_code}' "$PAGE_URL" || true)
-            html=$(curl -sS -L --max-time 15 "$PAGE_URL" || true)
-            live_version=$(curl -sS -L --max-time 15 "${PAGE_URL%/}/version.json" | jq -r .version 2>/dev/null || true)
-            live_commit=$(curl -sS -L --max-time 15 "${PAGE_URL%/}/build.json?v=$RUN_ID" | jq -r .commit 2>/dev/null || true)
+            ok=1
+            code=$(curl -sS -o /dev/null -L --max-time 15 --write-out '%{http_code}' "$base/" || true)
+            html=$(curl -sS -L --max-time 15 "$base/" || true)
+            live_version=$(curl -sS -L --max-time 15 "$base/version.json?v=$RUN_ID" | jq -r .version 2>/dev/null || true)
+            live_commit=$(curl -sS -L --max-time 15 "$base/build.json?v=$RUN_ID" | jq -r .commit 2>/dev/null || true)
             echo "$attempt/15 deneme -> HTTP $code, index.html ${#html} bayt, canlı sürüm: ${live_version:-yok}, canlı commit: ${live_commit:-yok}"
-            if [ "$code" = "200" ] && grep -q '</html>' <<< "$html" && [ -n "$live_version" ] && [ "$live_version" = "$expected_version" ] && [ "$live_commit" = "$EXPECTED_COMMIT" ]; then
-              echo "Dağıtım doğrulandı: $PAGE_URL (HTTP 200, index.html ${#html} bayt, sürüm $live_version, commit ${EXPECTED_COMMIT:0:7})"
+
+            [ "$code" = "200" ] && grep -q '</html>' <<< "$html" || ok=0
+            [ -n "$live_version" ] && [ "$live_version" = "$expected_version" ] || ok=0
+            [ "$live_commit" = "$EXPECTED_COMMIT" ] || ok=0
+
+            for file in "${critical_files[@]}"; do
+              read -r file_code file_size < <(curl -sS -L --max-time 15 -o /dev/null --write-out '%{http_code} %{size_download}' "$base/$file" || echo "000 0")
+              echo "  $file -> HTTP $file_code, $file_size bayt"
+              [ "$file_code" = "200" ] && [ "$file_size" -gt 0 ] || ok=0
+            done
+
+            # Derin bağlantı: dosyası olmayan yol için GitHub Pages 404.html'i
+            # (= index.html) 404 durumuyla sunar; önemli olan uygulama kabuğunun dönmesi.
+            deep=$(curl -sS -L --max-time 15 "$base/help/" || true)
+            echo "  help/ -> ${#deep} bayt (uygulama kabuğu: $(grep -q 'main.js' <<< "$deep" && echo var || echo yok))"
+            grep -q 'main.js' <<< "$deep" || ok=0
+
+            if [ "$ok" = "1" ]; then
+              echo "Dağıtım doğrulandı: $base (HTTP 200, index.html ${#html} bayt, sürüm $live_version, commit ${EXPECTED_COMMIT:0:7})"
               exit 0
             fi
             sleep 10
           done
-          echo "::error::Dağıtım doğrulanamadı: $PAGE_URL HTTP 200 dönmedi, index.html boş/eksik ya da canlı build '${EXPECTED_COMMIT:0:7}' commit'ini / '$expected_version' sürümünü sunmuyor"
+          echo "::error::Dağıtım doğrulanamadı: $base HTTP 200 dönmedi, index.html boş/eksik, kritik dosyalar eksik, derin bağlantı uygulama kabuğunu döndürmüyor ya da canlı build '${EXPECTED_COMMIT:0:7}' commit'ini / '$expected_version' sürümünü sunmuyor"
           exit 1
 # GitHub Actions ile dist/web çıktısını yayınlar.
